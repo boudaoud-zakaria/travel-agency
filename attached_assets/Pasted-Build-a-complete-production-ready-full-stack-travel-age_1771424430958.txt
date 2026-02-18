@@ -1,0 +1,98 @@
+Build a complete, production-ready, full-stack travel agency web application called 'Rihla' (رحلة) using Next.js 15 (App Router), TypeScript, Prisma ORM, SQLite database, Tailwind CSS, shadcn/ui, Framer Motion, and next-intl for i18n (Arabic/French/English with RTL support). All currency in Algerian Dinars (DZD / دج).
+━━━ STACK & TOOLING ━━━
+  • Framework: Next.js 14 App Router with TypeScript strict mode
+  • Database: SQLite via Prisma with @prisma/client — primary DB
+  • ORM: Prisma 5.x with full migration support and seed script
+  • Styling: Tailwind CSS 3.x with RTL plugin (tailwindcss-rtl)
+  • UI Library: shadcn/ui (Radix primitives, fully accessible)
+  • Animation: Framer Motion for page transitions, scroll effects, hover states
+  • Charts: Recharts for dashboard stats visualization
+  • Auth: NextAuth.js v5 with Credentials provider + JWT sessions
+  • i18n: next-intl with locale routing /[locale]/ prefix (ar, fr, en)
+  • Forms: React Hook Form + Zod validation (client + server)
+  • Tables: TanStack Table v8 (headless, sortable, filterable)
+  • State: Zustand for UI preferences (sidebar, language, theme)
+  • Email: Nodemailer for transactional emails
+  • Linter/Formatter: Biome (replaces ESLint + Prettier) — biome.json config
+  • Git Hooks: Husky with pre-commit (biome lint-staged), commit-msg (commitlint Conventional Commits), pre-push (tsc + vitest)
+  • Icons: Lucide React
+  • Fonts: Inter (Latin) + Noto Naskh Arabic (via next/font/google)
+━━━ DATABASE SCHEMA (Prisma) ━━━
+  • User: id(cuid), name, email(unique), password(bcrypt), phone?, role(EMPLOYEE|SUPER_ADMIN), avatar?, isActive(default:true), lastLoginAt?, createdAt, updatedAt
+  • TravelPackage: id, titleAr, titleFr, titleEn, descAr, descFr, descEn, destination, type(HAJJ|UMRAH|DOMESTIC|INTERNATIONAL), pricePerPerson(Float DZD), durationDays, maxCapacity, images(Json String[]), status(ACTIVE|DRAFT|ARCHIVED), departureDates(Json), inclusions(Json), exclusions(Json), itinerary(Json), rating(Float default 0), createdAt, updatedAt
+  • Reservation: id, code(unique RHL-YYYY-NNNNN), clientName, clientEmail, clientPhone, clientNIN(Algerian 18-digit ID), numberOfTravelers, travelDate, totalPriceDZD, status(PENDING|IN_REVIEW|CONFIRMED|REJECTED|CANCELLED|COMPLETED), specialRequests?, rejectionReason?, packageId(FK), assignedToId(FK User?), notes?, createdAt, updatedAt
+  • ReservationLog: id, reservationId(FK), userId(FK User?), fromStatus, toStatus, note?, createdAt
+  • Testimonial: id, clientName, content, rating(1-5), packageId(FK), isApproved(default:false), createdAt
+  • AgencySettings: id(singleton '1'), nameAr, nameFr, nameEn, logo?, address, phone, email, socialLinks(Json), heroTitleAr, heroTitleFr, heroTitleEn, heroSubtitleAr, heroSubtitleFr, heroSubtitleEn
+  • ContactMessage: id, name, email, phone?, subject, message, isRead(default:false), createdAt
+━━━ LANDING PAGE (Public) ━━━
+  • HERO: Full-viewport animated hero, background image with parallax, animated gradient overlay. Framer Motion typewriter effect on headline. CTAs: 'Explore' + 'Book Now'. Animated destination search bar with live filter. Language switcher (AR/FR/EN) with RTL auto-switch.
+  • STATS STRIP: Animated count-up numbers — Years of Experience, Destinations, Happy Clients, Trips Completed. Trigger on viewport entry.
+  • ABOUT: Agency story, mission, team. Split layout with image + text. Scroll-reveal animation.
+  • WHY US: 6 icon cards with hover animations — Safety, Experience, Certified Guides, Best Prices, 24/7 Support, Halal Services.
+  • PACKAGES GRID: Masonry/grid of TravelPackage cards. Each card: hero image, type badge (color-coded), destination, duration badge, price in DZD, star rating. Filter tabs: All / Hajj / Umrah / International / Domestic. Search input. Hover: lift + shadow + 'Book Now' overlay. Click → package detail page.
+  • PACKAGE DETAIL PAGE: Full image gallery (lightbox), complete description in 3 langs, inclusions/exclusions checklist, itinerary accordion, departure dates, pricing calculator (select travelers → auto-calculate total DZD), 'Reserve Now' button → redirect to reservation form.
+  • TESTIMONIALS: Auto-playing carousel, client name, rating stars, comment, package name.
+  • CONTACT: Form (name, email, phone, subject, message) + agency details + embedded map placeholder.
+  • FOOTER: Logo, nav links, package type links, social media, copyright, language switcher.
+━━━ RESERVATION FLOW (Client) ━━━
+  • 4-step wizard: (1) Package Selection → (2) Personal Info → (3) Travel Details → (4) Review & Confirm
+  • Step 1: Package summary display, departure date selector (available dates from DB), travelers count (1-20), live price calculation in DZD
+  • Step 2: Full Name, Email, Phone (+213 format), Algerian NIN (18 digits), Special Requests
+  • Step 3: Confirm travel date, number of travelers, review total price breakdown (price/person × travelers = total DZD)
+  • Step 4: Full summary, terms checkbox, Submit button
+  • POST /api/reservations → generate code RHL-YYYY-NNNNN → send confirmation email → show success page with code
+  • Zod validation on all fields, inline error messages, progress bar between steps
+  • Framer Motion slide animation between steps (slide left on advance, slide right on back)
+━━━ AUTH (Login) ━━━
+  • Single login page at /[locale]/login for both employees and super admins
+  • Email + password form. NextAuth Credentials provider. After login → redirect based on role: EMPLOYEE → /[locale]/employee/dashboard, SUPER_ADMIN → /[locale]/admin/dashboard
+  • Middleware: protect /employee/* (EMPLOYEE+) and /admin/* (SUPER_ADMIN only)
+  • Forgot password: generate reset token, email link (Nodemailer)
+  • Rate limit: 5 failed attempts → 15 min lockout (tracked in DB or memory)
+━━━ EMPLOYEE DASHBOARD ━━━
+  • LAYOUT: Responsive sidebar (collapsible), top header with user avatar + name + logout, breadcrumb, language switcher
+  • HOME: Welcome banner with employee name. 4 KPI cards: Total Handled, Confirmed, Pending, Rejected (with vs last month %). Pie chart: status distribution. Bar chart: daily reservations this month.
+  • RESERVATIONS TABLE: TanStack Table — columns: Code, Client, Package, Date, Travelers, Total DZD, Status badge, Actions. Filters: status dropdown, date range picker, search by name/code. Sort all columns. Pagination (25 per page). Row expand or modal: full details + status change + notes.
+  • STATUS CHANGE MODAL: Current status → new status selector (valid transitions only). Note field (required for REJECTED). Confirm button → PATCH API → optimistic UI update → log to ReservationLog.
+  • PROFILE: Avatar upload, name/phone edit, change password form.
+  • STATS PAGE: Personal performance — charts for processed per day/week/month, status breakdown, revenue processed, average handling time, performance score (confirmed/total × 100).
+━━━ SUPER ADMIN DASHBOARD ━━━
+  • OVERVIEW: 6 KPI cards: Total Reservations, Pending, Confirmed, Revenue DZD (total), Active Packages, Total Employees. Date filter (today/week/month/year). Revenue line chart (time series). Reservations status bar chart. Top 5 packages by bookings. Top 5 employees by performance. Recent reservations feed (live poll every 30s). Geographic heatmap by Algeria wilaya (SVG map).
+  • EMPLOYEE MANAGEMENT: DataTable of all employees — name, email, phone, role, status (active/inactive), last login, reservations handled. Actions: View Stats, Edit, Reset Password, Deactivate/Activate. Create Employee modal: name, email, temp password, phone, role. Employee detail page: full profile + all their reservations + personal stats charts.
+  • PACKAGE MANAGEMENT: DataTable of all packages with status filter. Create/Edit package form: multilingual fields (tabbed: AR/FR/EN), type, price (DZD), duration, capacity, departure dates picker, image upload (multi), inclusions/exclusions lists, itinerary builder (day-by-day accordion). Archive/restore packages. Duplicate package action.
+  • RESERVATIONS (GLOBAL): Same as employee but sees ALL. Extra: assign to employee dropdown. Bulk actions: confirm all selected, reject all (with reason). CSV export with date range filter.
+  • SETTINGS: Agency profile form. Hero content per language. Featured packages selector. Testimonials approval (list with approve/reject). Contact messages inbox (mark read/unread).
+  • AUDIT LOG: Table of all ReservationLogs — timestamp, employee, from status, to status, note. Filterable.
+━━━ DESIGN SYSTEM ━━━
+  • Colors: primary #1E3A5F (deep navy), accent #2E86AB (ocean blue), gold #F4A261 (warm gold for Hajj/Umrah), success #22C55E, warning #F59E0B, danger #EF4444, background #F8FAFC, card white with shadow
+  • Typography: Inter for Latin, Noto Naskh Arabic for Arabic (both via next/font/google). Headings: Playfair Display for landing hero only.
+  • Dark mode support via Tailwind dark: variants + next-themes
+  • RTL: When locale=ar, apply dir='rtl' on html, use Tailwind rtl: variants for spacing/flex direction
+  • shadcn/ui components: Button, Input, Select, Dialog, Sheet, Table, Card, Badge, Tabs, Calendar, DatePicker, Sonner (toasts), Skeleton, Progress, Avatar, DropdownMenu, AlertDialog, Separator, ScrollArea, Command, Popover, Tooltip
+  • Framer Motion: Page transitions (fade+slide via AnimatePresence + usePathname), scroll reveal (motion.div + useInView + whileInView), hover spring animations on cards, staggered children on grids, count-up animation on KPI numbers
+━━━ BIOME CONFIG (biome.json) ━━━
+  { "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json", "organizeImports": { "enabled": true }, "linter": { "enabled": true, "rules": { "recommended": true } }, "formatter": { "enabled": true, "indentWidth": 2, "indentStyle": "space", "lineWidth": 100 }, "javascript": { "formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always" } } }
+━━━ HUSKY HOOKS ━━━
+  • .husky/pre-commit: npx lint-staged
+  • .husky/commit-msg: npx --no -- commitlint --edit $1
+  • .husky/pre-push: npm run type-check && npm run test:unit
+  • lint-staged in package.json: '*.{ts,tsx}': ['biome check --apply'], '*.{json,md}': ['biome format --write']
+  • commitlint.config.js: extends ['@commitlint/config-conventional']
+  • package.json scripts: 'type-check': 'tsc --noEmit', 'test:unit': 'vitest run', 'db:push': 'prisma db push', 'db:seed': 'tsx prisma/seed.ts', 'db:studio': 'prisma studio'
+━━━ SEED DATA ━━━
+  • 1 Super Admin: admin@rihla.dz / Admin@123456
+  • 3 Employees with hashed passwords
+  • 8 TravelPackages (2 Hajj, 2 Umrah, 2 International, 2 Domestic) with full multilingual content, prices in DZD (e.g. Hajj package: 650,000 DZD)
+  • 20 sample Reservations in various statuses across employees
+  • 5 Testimonials (3 approved)
+  • Agency settings with Arabic agency name and contact info
+━━━ OUTPUT REQUIREMENTS ━━━
+  • Generate complete project structure with all files
+  • Include all Prisma schema, migrations, and seed file
+  • Include biome.json, .husky/ hooks, commitlint.config.js, lint-staged in package.json
+  • Include all translation files: messages/ar.json, messages/fr.json, messages/en.json with complete keys
+  • Include middleware.ts for route protection and locale routing
+  • Include all API route handlers with proper auth checks
+  • All components must be production-quality, not placeholders
+  • README.md with setup instructions: npm install → npx prisma db push → npm run db:seed → npm run dev
