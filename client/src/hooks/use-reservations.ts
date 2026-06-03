@@ -1,34 +1,34 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl } from "@shared/routes";
+import { reservationsApi } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
-export function useReservations(filters?: { status?: string; code?: string; packageId?: number }) {
+export function useReservations(filters?: {
+  status?: string;
+  code?: string;
+  packageId?: number;
+  assignedToId?: number;
+  search?: string;
+}) {
   return useQuery({
-    queryKey: [api.reservations.list.path, filters],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters?.status) params.append("status", filters.status);
-      if (filters?.code) params.append("code", filters.code);
-      if (filters?.packageId) params.append("packageId", filters.packageId.toString());
-
-      const url = `${api.reservations.list.path}?${params.toString()}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch reservations");
-      return await res.json();
-    },
+    queryKey: ["/api/reservations", filters],
+    queryFn: () => reservationsApi.list(filters),
   });
 }
 
 export function useReservation(id: number) {
   return useQuery({
-    queryKey: [api.reservations.get.path, id],
-    queryFn: async () => {
-      const url = buildUrl(api.reservations.get.path, { id });
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch reservation");
-      return await res.json();
-    },
+    queryKey: ["/api/reservations", id],
+    queryFn: () => reservationsApi.get(id),
     enabled: !!id,
+  });
+}
+
+export function useReservationByCode(code: string) {
+  return useQuery({
+    queryKey: ["/api/reservations/code", code],
+    queryFn: () => reservationsApi.getByCode(code),
+    enabled: !!code,
+    retry: false,
   });
 }
 
@@ -37,25 +37,14 @@ export function useCreateReservation() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await fetch(api.reservations.create.path, {
-        method: api.reservations.create.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to create reservation");
-      }
-      return await res.json();
-    },
+    mutationFn: (data: Record<string, unknown>) => reservationsApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.reservations.list.path] });
+      queryClient.invalidateQueries({ queryKey: ["/api/reservations"] });
       toast({ title: "Success", description: "Reservation created successfully" });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
+    },
   });
 }
 
@@ -64,23 +53,57 @@ export function useUpdateReservationStatus() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: number; status: string; note?: string; rejectionReason?: string }) => {
-      const url = buildUrl(api.reservations.updateStatus.path, { id });
-      const res = await fetch(url, {
-        method: api.reservations.updateStatus.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Failed to update reservation status");
-      return await res.json();
-    },
+    mutationFn: ({
+      id,
+      status,
+      note,
+      rejectionReason,
+    }: {
+      id: number;
+      status: string;
+      note?: string;
+      rejectionReason?: string;
+    }) => reservationsApi.updateStatus(id, status, note, rejectionReason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.reservations.list.path] });
-      queryClient.invalidateQueries({ queryKey: [api.reservations.get.path] });
+      queryClient.invalidateQueries({ queryKey: ["/api/reservations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       toast({ title: "Success", description: "Reservation status updated" });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
+    },
+  });
+}
+
+export function useUpdateReservation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ id, ...data }: { id: number } & Record<string, unknown>) =>
+      reservationsApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/reservations"] });
+      toast({ title: "Success", description: "Reservation updated" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useCancelReservation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (id: number) => reservationsApi.cancel(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/reservations"] });
+      toast({ title: "Success", description: "Reservation cancelled" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
   });
 }

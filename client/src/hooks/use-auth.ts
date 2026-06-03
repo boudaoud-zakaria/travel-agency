@@ -1,55 +1,44 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type User } from "@shared/routes"; // Assuming User type export exists or needs inference
-
-// Helper type since we can't import schema types directly in client if not exported
-type LoginInput = { username: string; password: string };
+import { authApi, setToken, clearToken } from "@/lib/api";
 
 export function useUser() {
   return useQuery({
-    queryKey: [api.auth.me.path],
-    queryFn: async () => {
-      const res = await fetch(api.auth.me.path);
-      if (res.status === 401) return null;
-      if (!res.ok) throw new Error("Failed to fetch user");
-      return await res.json();
-    },
+    queryKey: ["/api/user"],
+    queryFn: () => authApi.me(),
     retry: false,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
 export function useLogin() {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (data: LoginInput) => {
-      const res = await fetch(api.auth.login.path, {
-        method: api.auth.login.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      
-      if (!res.ok) {
-        throw new Error("Invalid credentials");
-      }
-      return await res.json();
+    mutationFn: async (data: { username: string; password?: string }) => {
+      const result = await authApi.login(data.username, data.password || "");
+      setToken(result.token);
+      return result.user;
     },
     onSuccess: (user) => {
-      queryClient.setQueryData([api.auth.me.path], user);
+      queryClient.setQueryData(["/api/user"], user);
     },
   });
 }
 
 export function useLogout() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async () => {
-      const res = await fetch(api.auth.logout.path, {
-        method: api.auth.logout.method,
-      });
-      if (!res.ok) throw new Error("Logout failed");
+      try {
+        await authApi.logout();
+      } finally {
+        clearToken();
+      }
     },
     onSuccess: () => {
-      queryClient.setQueryData([api.auth.me.path], null);
-      queryClient.invalidateQueries(); // Clear all data
+      queryClient.setQueryData(["/api/user"], null);
+      queryClient.clear();
     },
   });
 }
