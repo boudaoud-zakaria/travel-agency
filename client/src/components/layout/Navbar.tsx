@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const languages = [
   { code: 'en', label: 'English', flag: '🇬🇧', dir: 'ltr' },
@@ -24,8 +25,9 @@ export function Navbar() {
   const { data: user } = useUser();
   const { mutate: logout } = useLogout();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [lang, setLang] = useState('en');
   const [scrolled, setScrolled] = useState(false);
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language || 'en';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -34,20 +36,18 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { href: "/", label: "Expeditions" },
-    { href: "/packages", label: "Tours" },
-    { href: "/about", label: "Our Story" },
-    { href: "/contact", label: "Basecamp" },
+    { href: "/", label: t("nav.expeditions") },
+    { href: "/packages", label: t("nav.tours") },
   ];
 
   const handleLang = (code: string) => {
     const selected = languages.find(l => l.code === code)!;
-    setLang(code);
     document.documentElement.dir = selected.dir;
     document.documentElement.lang = code;
+    i18n.changeLanguage(code);
   };
 
-  const currentLang = languages.find(l => l.code === lang)!;
+  const currentLang = languages.find(l => l.code === lang) || languages[0];
 
   return (
     <motion.nav
@@ -73,12 +73,12 @@ export function Navbar() {
           </div>
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-2">
-              <Mountain className="w-3.5 h-3.5 text-emerald-400" /> 
-              Alpine & Adventure Specialists
+              <Mountain className="w-3.5 h-3.5 text-emerald-400" />
+              {t("brand")} — Algeria 🇩🇿
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-              Guides on standby
+              {t("nav.guides")}
             </span>
           </div>
         </div>
@@ -95,10 +95,10 @@ export function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="text-2xl font-black text-primary leading-none tracking-tighter uppercase" style={{ fontFamily: "'Inter', sans-serif" }}>
-              Travel Genius
+              {t("brand")}
             </span>
             <span className="text-[10px] font-black tracking-[4px] text-emerald-600 uppercase leading-none mt-1">
-              Adventure HQ
+              {t("tagline")}
             </span>
           </div>
         </Link>
@@ -171,7 +171,7 @@ export function Navbar() {
                       <User className="h-4 w-4 text-primary" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold">Basecamp Dashboard</span>
+                      <span className="text-sm font-bold">{t("nav.dashboard")}</span>
                       <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Manage Expeditions</span>
                     </div>
                   </Link>
@@ -181,7 +181,7 @@ export function Navbar() {
                   <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
                     <LogOut className="h-4 w-4" />
                   </div>
-                  <span className="text-sm font-bold">Leave Headquarters</span>
+                  <span className="text-sm font-bold">{t("nav.logout")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -189,12 +189,12 @@ export function Navbar() {
             <div className="flex items-center gap-3">
               <Link href="/my-reservation">
                 <Button variant="ghost" className="h-10 text-xs font-black uppercase tracking-widest gap-2 text-muted-foreground hover:text-primary px-4">
-                  <FileText className="h-4 w-4" /> Tracking
+                  <FileText className="h-4 w-4" /> {t("nav.tracking")}
                 </Button>
               </Link>
               <Link href="/auth">
                 <Button variant="ghost" className="h-10 text-xs font-black uppercase tracking-widest px-4 hover:bg-muted rounded-xl">
-                  Entry
+                  {t("nav.entry")}
                 </Button>
               </Link>
               <Link href="/reserve">
@@ -202,7 +202,7 @@ export function Navbar() {
                   size="sm"
                   className="h-11 px-6 bg-primary hover:bg-primary/95 text-white shadow-xl shadow-primary/20 border-0 font-black text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95"
                 >
-                  Book Expedition
+                  {t("nav.book")}
                 </Button>
               </Link>
             </div>
@@ -223,8 +223,8 @@ export function Navbar() {
                   <Mountain className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-center">
-                  <div className="text-white font-black text-2xl tracking-tighter uppercase">Travel Genius</div>
-                  <div className="text-emerald-400 text-[10px] tracking-[4px] uppercase font-black mt-1">Adventure HQ</div>
+                  <div className="text-white font-black text-2xl tracking-tighter uppercase">{t("brand")}</div>
+                  <div className="text-emerald-400 text-[10px] tracking-[4px] uppercase font-black mt-1">{t("tagline")}</div>
                 </div>
               </div>
               

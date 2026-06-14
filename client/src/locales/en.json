@@ -1,0 +1,77 @@
+{
+  "brand": "Tehwissa 213",
+  "tagline": "Adventure HQ",
+  "nav": {
+    "expeditions": "Expeditions",
+    "tours": "Tours",
+    "story": "Our Story",
+    "basecamp": "Basecamp",
+    "tracking": "Tracking",
+    "entry": "Entry",
+    "book": "Book Expedition",
+    "dashboard": "Basecamp Dashboard",
+    "logout": "Leave Headquarters",
+    "guides": "Guides on standby"
+  },
+  "hero": {
+    "badge": "Algeria's Premier Hiking & Trekking Agency",
+    "headline1": "TEHWISSA",
+    "headline2": "213",
+    "tagline": "Discover Algeria",
+    "subtitle": "Explore the untamed beauty of Algeria. From snow-capped 2,000m summits to ancient Tassili rock art trails — your expedition starts here.",
+    "searchPlaceholder": "Where do you want to hike?",
+    "exploreBtn": "Explore Trails",
+    "viewPeaks": "View All Peaks",
+    "startReservation": "Start Reservation",
+    "scroll": "Explore"
+  },
+  "stats": {
+    "summits": "Successful Summits",
+    "miles": "Trail Miles Guided",
+    "guides": "Expert Guides",
+    "safety": "Safety Rating"
+  },
+  "trekTypes": {
+    "sectionLabel": "Pathways to Adventure",
+    "heading": "TREK YOUR WAY",
+    "desc": "We categorize our expeditions by terrain and intensity. Whether you're a ridge scrambler or a desert wanderer, your path is here.",
+    "viewRoutes": "View Routes"
+  },
+  "packages": {
+    "sectionLabel": "CURATED SUMMITS",
+    "heading": "ELITE EXPEDITIONS",
+    "viewAll": "View All Adventures"
+  },
+  "about": {
+    "label": "THE TEHWISSA 213 LEGACY",
+    "heading1": "BORN IN THE",
+    "heading2": "MOUNTAINS.",
+    "desc": "Tehwissa 213 isn't just a booking platform — we are a community of mountain lovers and professional alpinists. Since 2009, we've guided over 12,000 adventurers through the most rigorous and rewarding terrains of Algeria.",
+    "years": "Years of Excellence",
+    "cta": "Deep Dive Into Our Mission",
+    "why": {
+      "safety_title": "Safety First Protocol",
+      "safety_desc": "Certified first-aid guides and satellite GPS tracking on every mountain expedition.",
+      "guides_title": "Expert Local Guides",
+      "guides_desc": "Guides who were born in these mountains and know every hidden trail and cave.",
+      "eco_title": "Eco-Friendly Travel",
+      "eco_desc": "Strict 'Leave No Trace' policy. We protect the nature we love to explore.",
+      "photo_title": "Photography Support",
+      "photo_desc": "Our guides help you capture the most stunning viewpoints at the golden hour."
+    }
+  },
+  "contact": {
+    "label": "Basecamp Contact",
+    "heading1": "YOUR SUMMIT",
+    "heading2": "AWAITS.",
+    "desc": "Don't just dream of the views — stand in them. Our experts are ready to design your ideal route today.",
+    "call": "Call Command",
+    "booking": "Quick Booking",
+    "hq": "HEADQUARTERS",
+    "findBasecamp": "FIND BASECAMP",
+    "office": "Expedition Office",
+    "emergency": "Emergency Line",
+    "comms": "Comms",
+    "ops": "Ops Hours"
+  }
+}

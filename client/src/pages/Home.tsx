@@ -3,15 +3,14 @@ import { Footer } from "@/components/layout/Footer";
 import { PackageCard } from "@/components/packages/PackageCard";
 import { usePackages } from "@/hooks/use-packages";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { motion, useInView } from "framer-motion";
 import {
-  ArrowRight, CheckCircle2, Star, Search, MapPin, Clock, Users,
-  Shield, Award, HeartHandshake, Globe, TrendingUp, Plane, Quote,
-  ChevronRight, Phone, Mountain, Tent, Trees, Wind, Camera
+  ArrowRight, MapPin, Clock,
+  Shield, Award, HeartHandshake, Globe, Phone, Mountain, Tent, Trees, Wind, Camera, ChevronRight
 } from "lucide-react";
 import { Link } from "wouter";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react"; // useState used in AnimatedCounter
+import { useTranslation } from "react-i18next";
 
 /* ── Animated Counter ─────────────────────────────────────── */
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -61,131 +60,67 @@ function FadeSection({ children, delay = 0, className = "" }: { children: React.
   );
 }
 
-/* ── Package type icons ──────────────────────────────────── */
-const packageTypes = [
-  {
-    type: "TREK",
-    emoji: "🏔️",
-    icon: Mountain,
-    title: "Alpine Treks",
-    titleAr: "قمم الأطلس",
-    color: "from-blue-500 to-indigo-700",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    desc: "Challenging summits and ridge walks in the Djurdjura and Blida Atlas ranges.",
-  },
-  {
-    type: "SAHARA",
-    emoji: "🏜️",
-    icon: Wind,
-    title: "Desert Expeditions",
-    titleAr: "رحلات الصحراء",
-    color: "from-amber-500 to-orange-700",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    desc: "Venture deep into the Tassili N'Ajjer and Hoggar for multi-day desert trekking.",
-  },
-  {
-    type: "FOREST",
-    emoji: "🌲",
-    icon: Trees,
-    title: "Wilderness Retreats",
-    titleAr: "خلوة الغابات",
-    color: "from-emerald-500 to-teal-700",
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    desc: "Lush forest trails and hidden waterfalls in El Kala and Akfadou regions.",
-  },
-  {
-    type: "CAMPING",
-    emoji: "⛺",
-    icon: Tent,
-    title: "Camping Adventures",
-    titleAr: "مغامرات التخييم",
-    color: "from-rose-500 to-rose-700",
-    bg: "bg-rose-50",
-    border: "border-rose-200",
-    desc: "Night-under-stars experiences with full equipment provided for wild terrains.",
-  },
-];
-
-const stats = [
-  { label: "Successful Summits", value: 450, suffix: "+", icon: "🏔️" },
-  { label: "Trail Miles Guided", value: 15000, suffix: "+", icon: "🥾" },
-  { label: "Expert Guides", value: 25, suffix: "+", icon: "👤" },
-  { label: "Safety Rating", value: 100, suffix: "%", icon: "🛡️" },
-];
-
-const whyUs = [
-  {
-    icon: Shield,
-    title: "Safety First Protocol",
-    desc: "Certified first-aid guides and satellite GPS tracking on every mountain expedition.",
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-  },
-  {
-    icon: HeartHandshake,
-    title: "Expert Local Guides",
-    desc: "Guides who were born in these mountains and know every hidden trail and cave.",
-    color: "text-rose-600",
-    bg: "bg-rose-50",
-  },
-  {
-    icon: Award,
-    title: "Eco-Friendly Travel",
-    desc: "Strict 'Leave No Trace' policy. We protect the nature we love to explore.",
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-  },
-  {
-    icon: Camera,
-    title: "Photography Support",
-    desc: "Our guides help you capture the most stunning viewpoints at the golden hour.",
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-  },
-];
-
-const testimonials = [
-  {
-    name: "Ahmed Benali",
-    location: "Alger",
-    role: "Djurdjura Summit 2024",
-    text: "Standing on top of Lalla Khedidja at dawn was a dream come true. The gear was top-notch and our guide's knowledge of the terrain made us feel completely safe.",
-    rating: 5,
-    avatar: "A",
-  },
-  {
-    name: "Fatima Zohra",
-    location: "Oran",
-    role: "Tassili Trekker",
-    text: "The silence of the Tassili at night is something everyone should experience. Sleeping under the stars after a 15km hike — absolutely unforgettable properly organized trip.",
-    rating: 5,
-    avatar: "F",
-  },
-  {
-    name: "Karim Saadi",
-    location: "Constantine",
-    role: "Waterfall Explorer",
-    text: "The Akfadou forest hike was perfect for my family. Lush greenery and cool waterfalls. The guide even identified all the local birds for us. Highly recommended!",
-    rating: 5,
-    avatar: "K",
-  },
-  {
-    name: "Leila Mammeri",
-    location: "Annaba",
-    role: "Atlas Winter Hike",
-    text: "I was worried about the snow, but the agency provided excellent crampons and professional winter gear. It was a rigorous but rewarding adventure.",
-    rating: 5,
-    avatar: "L",
-  },
-];
-
 export default function Home() {
+  const { t } = useTranslation();
   const { data: packages, isLoading } = usePackages({ status: "ACTIVE" });
   const featuredPackages = packages?.slice(0, 3) || [];
-  const [searchQuery, setSearchQuery] = useState("");
+
+  const packageTypes = [
+    {
+      type: "TREK",
+      icon: Mountain,
+      title: "Alpine Treks",
+      titleAr: "قمم الأطلس",
+      color: "from-blue-500 to-indigo-700",
+      bg: "bg-blue-50",
+      border: "border-blue-200",
+      desc: "Challenging summits and ridge walks in the Djurdjura and Blida Atlas ranges.",
+    },
+    {
+      type: "SAHARA",
+      icon: Wind,
+      title: "Desert Expeditions",
+      titleAr: "رحلات الصحراء",
+      color: "from-amber-500 to-orange-700",
+      bg: "bg-amber-50",
+      border: "border-amber-200",
+      desc: "Venture deep into the Tassili N'Ajjer and Hoggar for multi-day desert trekking.",
+    },
+    {
+      type: "FOREST",
+      icon: Trees,
+      title: "Wilderness Retreats",
+      titleAr: "خلوة الغابات",
+      color: "from-emerald-500 to-teal-700",
+      bg: "bg-emerald-50",
+      border: "border-emerald-200",
+      desc: "Lush forest trails and hidden waterfalls in El Kala and Akfadou regions.",
+    },
+    {
+      type: "CAMPING",
+      icon: Tent,
+      title: "Camping Adventures",
+      titleAr: "مغامرات التخييم",
+      color: "from-rose-500 to-rose-700",
+      bg: "bg-rose-50",
+      border: "border-rose-200",
+      desc: "Night-under-stars experiences with full equipment provided for wild terrains.",
+    },
+  ];
+
+  const stats = [
+    { labelKey: "stats.summits", value: 450, suffix: "+", icon: "🏔️" },
+    { labelKey: "stats.miles", value: 15000, suffix: "+", icon: "🥾" },
+    { labelKey: "stats.guides", value: 25, suffix: "+", icon: "👤" },
+    { labelKey: "stats.safety", value: 100, suffix: "%", icon: "🛡️" },
+  ];
+
+  const whyUs = [
+    { icon: Shield, titleKey: "about.why.safety_title", descKey: "about.why.safety_desc", color: "text-blue-600", bg: "bg-blue-50" },
+    { icon: HeartHandshake, titleKey: "about.why.guides_title", descKey: "about.why.guides_desc", color: "text-rose-600", bg: "bg-rose-50" },
+    { icon: Award, titleKey: "about.why.eco_title", descKey: "about.why.eco_desc", color: "text-amber-600", bg: "bg-amber-50" },
+    { icon: Camera, titleKey: "about.why.photo_title", descKey: "about.why.photo_desc", color: "text-emerald-600", bg: "bg-emerald-50" },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -194,123 +129,111 @@ export default function Home() {
       <main className="flex-grow">
 
         {/* ─── HERO ─────────────────────────────────────────── */}
-        <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden">
           {/* Background */}
           <div className="absolute inset-0 z-0">
             <img
               src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=80"
               alt="Algerian Mountains"
-              className="w-full h-full object-cover scale-105"
+              className="w-full h-full object-cover"
               style={{ animation: "heroZoom 20s ease-in-out infinite alternate" }}
             />
-            {/* Multi-layer overlay */}
-            <div className="absolute inset-0 bg-black/40 z-1" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent z-2" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
           </div>
 
-          {/* Floating particles (Snow/Dust) */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-5">
-            {Array.from({ length: 30 }).map((_, i) => (
+          {/* Decorative horizontal lines */}
+          <div className="absolute inset-0 pointer-events-none z-5 overflow-hidden">
+            {[15, 40, 65, 88].map((top, i) => (
               <div
                 key={i}
-                className="absolute w-0.5 h-0.5 bg-white/30 rounded-full"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animation: `float ${4 + Math.random() * 6}s ease-in-out ${Math.random() * 3}s infinite`,
-                }}
+                className="absolute w-full h-px bg-white/5"
+                style={{ top: `${top}%` }}
               />
             ))}
           </div>
 
-          <div className="container relative z-10 px-4 text-center">
+          <div className="container relative z-10 px-4 text-center max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex flex-col items-center gap-6"
             >
-              {/* Badge */}
+              {/* Country badge */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
-                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2 mb-8 text-white text-sm font-medium"
+                className="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-2.5 text-white text-xs font-semibold tracking-wider"
               >
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
-                Algeria's Premier Hiking & Trekking Agency 🏔️
+                <span className="text-base">🇩🇿</span>
+                {t("hero.badge")}
+                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
               </motion.div>
 
-              {/* Headline */}
-              <motion.h1
+              {/* Main brand name */}
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="text-5xl md:text-8xl font-black text-white mb-6 leading-[0.9] tracking-tighter"
-                style={{ fontFamily: "'Inter', sans-serif" }}
+                transition={{ delay: 0.35, duration: 0.9 }}
+                className="flex flex-col items-center"
               >
-                UNLEASH THE<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-blue-400">
-                  WILD WITHIN
-                </span>
-              </motion.h1>
+                <h1
+                  className="text-[clamp(2.5rem,8vw,6rem)] font-black text-white leading-none tracking-tighter uppercase"
+                  style={{ fontFamily: "'Inter', sans-serif", textShadow: "0 4px 40px rgba(0,0,0,0.5)" }}
+                >
+                  {t("hero.headline1")}
+                </h1>
+                <div className="flex items-center gap-4 mt-1">
+                  <div className="h-1 w-12 bg-emerald-400 rounded-full" />
+                  <span
+                    className="text-[clamp(1.8rem,5vw,4rem)] font-black tracking-tighter"
+                    style={{ color: "#34d399", textShadow: "0 0 60px rgba(52,211,153,0.5)" }}
+                  >
+                    {t("hero.headline2")}
+                  </span>
+                  <div className="h-1 w-12 bg-emerald-400 rounded-full" />
+                </div>
+                <p className="text-white/60 text-sm font-black uppercase tracking-[6px] mt-3">
+                  {t("hero.tagline")}
+                </p>
+              </motion.div>
 
+              {/* Subtitle */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-10 leading-relaxed font-medium"
+                transition={{ delay: 0.55, duration: 0.8 }}
+                className="text-base md:text-lg text-white/80 max-w-xl mx-auto leading-relaxed font-medium"
               >
-                Discover the untamed beauty of Algeria. From snow-capped 2,000m summits
-                to ancient Tassili rock art trails — expedition start here.
+                {t("hero.subtitle")}
               </motion.p>
-
-              {/* Search Bar */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.7 }}
-                className="max-w-xl mx-auto p-2 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 flex gap-2 mb-10 shadow-2xl"
-              >
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-                  <Input
-                    placeholder="Where do you want to hike?"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 h-11 border-0 bg-transparent focus-visible:ring-0 text-white placeholder:text-white/40"
-                  />
-                </div>
-                <Link href={`/packages${searchQuery ? `?search=${searchQuery}` : ""}`}>
-                  <Button className="h-11 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg border-0 transition-all hover:scale-105">
-                    Explore Trails
-                  </Button>
-                </Link>
-              </motion.div>
 
               {/* CTA Buttons */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1, duration: 0.6 }}
+                transition={{ delay: 0.9, duration: 0.6 }}
                 className="flex flex-col sm:flex-row items-center justify-center gap-4"
               >
                 <Link href="/packages">
                   <Button
                     size="lg"
-                    className="h-14 px-8 bg-white text-primary hover:bg-white/90 text-base font-black rounded-2xl shadow-2xl border-0"
+                    className="h-13 px-8 bg-white text-primary hover:bg-white/90 text-sm font-black rounded-2xl shadow-2xl border-0 gap-2"
                   >
-                    <Mountain className="mr-2 h-5 w-5" />
-                    View All Peaks
+                    <Mountain className="h-5 w-5" />
+                    {t("hero.viewPeaks")}
                   </Button>
                 </Link>
                 <Link href="/reserve">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="h-14 px-8 bg-white/5 border-white/20 text-white hover:bg-white/10 backdrop-blur-md text-base font-bold rounded-2xl"
+                    className="h-13 px-8 bg-white/5 border-white/25 text-white hover:bg-white/15 backdrop-blur-md text-sm font-bold rounded-2xl gap-2"
                   >
-                    Start Reservation
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    {t("hero.startReservation")}
+                    <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
               </motion.div>
@@ -318,9 +241,8 @@ export default function Home() {
           </div>
 
           {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/50">
-            <span className="text-[10px] font-black tracking-[3px] uppercase">Descend</span>
-            <div className="w-0.5 h-12 bg-gradient-to-b from-emerald-400 to-transparent animate-pulse" />
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/40">
+            <div className="w-px h-10 bg-gradient-to-b from-emerald-400 to-transparent animate-pulse" />
           </div>
         </section>
 
@@ -335,7 +257,7 @@ export default function Home() {
                     <div className="text-3xl md:text-4xl font-black text-primary">
                       <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                     </div>
-                    <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{stat.label}</div>
+                    <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{t(stat.labelKey)}</div>
                   </div>
                 </FadeSection>
               ))}
@@ -349,13 +271,13 @@ export default function Home() {
             <FadeSection>
               <div className="text-center mb-16">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-[2px] border border-emerald-100 mb-6">
-                  Pathways to Adventure
+                  {t("trekTypes.sectionLabel")}
                 </div>
                 <h2 className="text-4xl md:text-6xl font-black text-primary mb-4 leading-none">
-                  TREK YOUR WAY
+                  {t("trekTypes.heading")}
                 </h2>
                 <p className="text-muted-foreground max-w-xl mx-auto font-medium">
-                  We categorize our expeditions by terrain and intensity. Whether you're a ridge scrambler or a desert wanderer, your path is here.
+                  {t("trekTypes.desc")}
                 </p>
               </div>
             </FadeSection>
@@ -365,7 +287,7 @@ export default function Home() {
                 <FadeSection key={type.type} delay={idx * 0.1}>
                   <Link href={`/packages?type=${type.type}`}>
                     <div className={`group relative overflow-hidden rounded-3xl border-2 ${type.border} ${type.bg} p-8 h-full cursor-pointer hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl`}>
-                      <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-4xl mb-6 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
+                      <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
                         <type.icon className="w-8 h-8" />
                       </div>
                       <h3 className="text-2xl font-black text-gray-900 mb-3 flex flex-col">
@@ -375,10 +297,9 @@ export default function Home() {
                       <p className="text-sm text-gray-600 leading-relaxed font-medium">{type.desc}</p>
 
                       <div className={`mt-8 flex items-center gap-2 text-xs font-black uppercase tracking-widest bg-gradient-to-r ${type.color} bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity`}>
-                        View Routes <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ color: "var(--primary)" }} />
+                        {t("trekTypes.viewRoutes")} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ color: "var(--primary)" }} />
                       </div>
 
-                      {/* Decorative background number */}
                       <div className="absolute -bottom-4 -right-2 text-9xl font-black text-black/5 pointer-events-none select-none">
                         0{idx + 1}
                       </div>
@@ -396,14 +317,14 @@ export default function Home() {
             <FadeSection>
               <div className="flex flex-col md:flex-row items-center md:items-end justify-between mb-16 gap-6 text-center md:text-left">
                 <div>
-                  <div className="text-emerald-500 text-[10px] font-black uppercase tracking-[3px] mb-2">CURATED SUMMITS</div>
+                  <div className="text-emerald-500 text-[10px] font-black uppercase tracking-[3px] mb-2">{t("packages.sectionLabel")}</div>
                   <h2 className="text-4xl md:text-5xl font-black text-primary">
-                    ELITE EXPEDITIONS
+                    {t("packages.heading")}
                   </h2>
                 </div>
                 <Link href="/packages">
                   <Button variant="ghost" className="font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white group">
-                    View All Adventures <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    {t("packages.viewAll")} <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
               </div>
@@ -448,7 +369,6 @@ export default function Home() {
 
         {/* ─── ABOUT / WHY CHOOSE US ───────────────────────── */}
         <section className="py-32 bg-white relative overflow-hidden">
-          {/* Top topographic lines decoration */}
           <div className="absolute top-0 right-0 w-1/2 h-full opacity-5 pointer-events-none">
             <svg viewBox="0 0 100 100" className="w-full h-full text-primary fill-current">
               <path d="M0 20 Q20 15 40 30 T80 25 T100 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
@@ -459,7 +379,6 @@ export default function Home() {
 
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
-              {/* Left: Images */}
               <FadeSection>
                 <div className="relative">
                   <div className="grid grid-cols-12 gap-4">
@@ -484,25 +403,22 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* High Tech Badge */}
                   <div className="absolute -top-10 -left-6 bg-primary text-white p-6 rounded-[2rem] shadow-2xl rotate-[-5deg]">
                     <div className="text-4xl font-black">15+</div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest leading-none mt-1">Years of<br />Excellence</div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest leading-none mt-1">{t("about.years")}</div>
                   </div>
                 </div>
               </FadeSection>
 
-              {/* Right: Content */}
               <FadeSection delay={0.2}>
                 <div className="space-y-10">
                   <div>
-                    <div className="text-emerald-500 text-[10px] font-black uppercase tracking-[3px] mb-4">THE TRAVEL GENIUS LEGACY</div>
+                    <div className="text-emerald-500 text-[10px] font-black uppercase tracking-[3px] mb-4">{t("about.label")}</div>
                     <h2 className="text-4xl md:text-6xl font-black text-primary mb-6 leading-[0.9]">
-                      BORN IN THE<br />MOUNTAINS.
+                      {t("about.heading1")}<br />{t("about.heading2")}
                     </h2>
                     <p className="text-muted-foreground leading-relaxed text-lg font-medium">
-                      Travel Genius isn't just a booking platform — we are a community of mountain lovers and professional alpinists.
-                      Since 2009, we've guided over 12,000 adventurers through the most rigorous and rewarding terrains of Algeria.
+                      {t("about.desc")}
                     </p>
                   </div>
 
@@ -515,60 +431,19 @@ export default function Home() {
                         <div className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                           <item.icon className={`w-6 h-6 ${item.color}`} />
                         </div>
-                        <h4 className="font-black text-sm text-gray-900 mb-2 uppercase tracking-wide">{item.title}</h4>
-                        <p className="text-xs text-gray-500 leading-relaxed font-medium">{item.desc}</p>
+                        <h4 className="font-black text-sm text-gray-900 mb-2 uppercase tracking-wide">{t(item.titleKey)}</h4>
+                        <p className="text-xs text-gray-500 leading-relaxed font-medium">{t(item.descKey)}</p>
                       </div>
                     ))}
                   </div>
 
                   <Link href="/about">
                     <Button className="bg-primary text-white hover:bg-primary/95 font-black h-16 px-10 rounded-2xl shadow-xl shadow-primary/20 text-xs uppercase tracking-widest">
-                      Deep Dive Into Our Mission <ArrowRight className="ml-2 w-4 h-4" />
+                      {t("about.cta")} <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>
                 </div>
               </FadeSection>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── TESTIMONIALS ────────────────────────────────── */}
-        <section className="py-24 bg-gray-950 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
-
-          <div className="container mx-auto px-4 relative z-10 text-center">
-            <FadeSection>
-              <div className="mb-20">
-                <div className="text-emerald-400 text-[10px] font-black uppercase tracking-[5px] mb-4">ECHOES FROM THE FIELD</div>
-                <h2 className="text-4xl md:text-7xl font-black mb-6">VOICES OF THE WILD</h2>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  {[1, 2, 3, 4, 5].map(s => <Star key={s} className="w-5 h-5 fill-emerald-400 text-emerald-400" />)}
-                  <span className="ml-3 text-2xl font-black">4.9/5</span>
-                </div>
-                <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Verified Alpinist Reviews</p>
-              </div>
-            </FadeSection>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-              {testimonials.map((t, i) => (
-                <FadeSection key={i} delay={i * 0.1}>
-                  <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] p-8 h-full flex flex-col hover:bg-white/10 transition-all group">
-                    <Quote className="w-10 h-10 text-emerald-500 mb-6 opacity-50 group-hover:opacity-100 transition-opacity" />
-                    <p className="text-white/80 text-sm leading-relaxed flex-1 italic font-medium mb-10">
-                      "{t.text}"
-                    </p>
-                    <div className="flex items-center gap-4 pt-6 border-t border-white/10">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-500 to-blue-500 flex items-center justify-center text-white font-black text-sm shrink-0">
-                        {t.avatar}
-                      </div>
-                      <div>
-                        <div className="font-black text-xs uppercase tracking-widest tracking-tighter">{t.name}</div>
-                        <div className="text-white/40 text-[10px] uppercase font-bold tracking-tight mt-1">{t.role}</div>
-                      </div>
-                    </div>
-                  </div>
-                </FadeSection>
-              ))}
             </div>
           </div>
         </section>
@@ -585,25 +460,25 @@ export default function Home() {
                   <div className="text-center md:text-left">
                     <div className="inline-flex items-center gap-2 mb-6 px-4 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
                       <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs font-bold uppercase tracking-widest">Basecamp Contact</span>
+                      <span className="text-xs font-bold uppercase tracking-widest">{t("contact.label")}</span>
                     </div>
                     <h2 className="text-4xl md:text-7xl font-black mb-6 leading-none tracking-tighter">
-                      YOUR SUMMIT<br />AWAITS.
+                      {t("contact.heading1")}<br />{t("contact.heading2")}
                     </h2>
                     <p className="text-white/60 max-w-lg text-lg font-medium">
-                      Don't just dream of the views — stand in them. Our experts are ready to design your ideal route today.
+                      {t("contact.desc")}
                     </p>
                   </div>
                   <div className="flex flex-col gap-4 shrink-0 sm:min-w-[280px]">
                     <a href="tel:+213210000000">
-                      <Button size="lg" className="h-20 px-10 bg-white text-primary hover:bg-emerald-50 font-black rounded-[2rem] shadow-2xl gap-3 text-sm uppercase tracking-widest">
+                      <Button size="lg" className="w-full h-20 px-10 bg-white text-primary hover:bg-emerald-50 font-black rounded-[2rem] shadow-2xl gap-3 text-sm uppercase tracking-widest">
                         <Phone className="w-6 h-6" />
-                        Call Command
+                        {t("contact.call")}
                       </Button>
                     </a>
                     <Link href="/reserve">
-                      <Button size="lg" variant="outline" className="h-16 px-10 border-white/30 text-white hover:bg-white/10 rounded-2xl font-bold gap-3 uppercase tracking-tighter">
-                        Quick Booking <ArrowRight className="w-5 h-5" />
+                      <Button size="lg" variant="outline" className="w-full h-16 px-10 border-white/30 text-white hover:bg-white/10 rounded-2xl font-bold gap-3 uppercase tracking-tighter">
+                        {t("contact.booking")} <ArrowRight className="w-5 h-5" />
                       </Button>
                     </Link>
                   </div>
@@ -613,52 +488,35 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ─── CONTACT & MAP ───────────────────────────────── */}
+        {/* ─── CONTACT INFO ────────────────────────────────── */}
         <section className="py-24 bg-muted/20 border-t border-border/50">
           <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-3 gap-16">
-              <FadeSection className="lg:col-span-1 space-y-10">
+            <FadeSection>
+              <div className="max-w-2xl mx-auto space-y-10">
                 <div>
-                  <div className="text-[10px] font-black text-primary/40 uppercase tracking-[4px] mb-2">HEADQUARTERS</div>
-                  <h2 className="text-4xl font-black text-primary">FIND BASECAMP</h2>
+                  <div className="text-[10px] font-black text-primary/40 uppercase tracking-[4px] mb-2">{t("contact.hq")}</div>
+                  <h2 className="text-4xl font-black text-primary">{t("contact.findBasecamp")}</h2>
                 </div>
-                <div className="space-y-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   {[
-                    { icon: MapPin, label: "Expedition Office", value: "123 Rue Didouche Mourad, Alger-Centre 16000" },
-                    { icon: Phone, label: "Emergency Line", value: "+213 21 00 00 00" },
-                    { icon: Globe, label: "Comms", value: "hq@travelgenius.dz" },
-                    { icon: Clock, label: "Ops Hours", value: "Mon–Fri: 08:00–18:00, Sat: 09:00–16:00" },
-                  ].map(({ icon: Icon, label, value }, i) => (
-                    <div key={i} className="flex items-start gap-5">
-                      <div className="w-12 h-12 rounded-2xl bg-white border border-border shadow-sm flex items-center justify-center shrink-0">
+                    { icon: MapPin, labelKey: "contact.office", value: "123 Rue Didouche Mourad, Alger-Centre 16000" },
+                    { icon: Phone, labelKey: "contact.emergency", value: "+213 21 00 00 00" },
+                    { icon: Globe, labelKey: "contact.comms", value: "hq@tehwissa213.dz" },
+                    { icon: Clock, labelKey: "contact.ops", value: "Mon–Fri: 08:00–18:00, Sat: 09:00–16:00" },
+                  ].map(({ icon: Icon, labelKey, value }, i) => (
+                    <div key={i} className="flex items-start gap-5 p-5 rounded-2xl bg-white border border-border/50 shadow-sm">
+                      <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0">
                         <Icon className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{label}</div>
+                        <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t(labelKey)}</div>
                         <div className="text-sm font-bold text-foreground mt-1">{value}</div>
                       </div>
                     </div>
                   ))}
                 </div>
-              </FadeSection>
-
-              {/* Map embed */}
-              <FadeSection delay={0.2} className="lg:col-span-2">
-                <div className="rounded-[3rem] overflow-hidden shadow-2xl h-[500px] border-8 border-white group">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6401.558898064827!2d3.0588!3d36.7378!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x128fada7f77a6f2d%3A0x9e7e16d6ad50b6f!2sRue%20Didouche%20Mourad%2C%20Alger%2C%20Algeria!5e0!3m2!1sen!2sus!4v1700000000000"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Travel Genius HQ Location"
-                    className="grayscale group-hover:grayscale-0 transition-all duration-700"
-                  />
-                </div>
-              </FadeSection>
-            </div>
+              </div>
+            </FadeSection>
           </div>
         </section>
 
@@ -669,11 +527,7 @@ export default function Home() {
       <style>{`
         @keyframes heroZoom {
           from { transform: scale(1); }
-          to { transform: scale(1.1); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          50% { transform: translateY(-20px) translateX(10px); }
+          to { transform: scale(1.08); }
         }
         .mountain-bg {
           background-image: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');

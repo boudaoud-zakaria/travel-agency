@@ -1,0 +1,77 @@
+{
+  "brand": "Tehwissa 213",
+  "tagline": "QG Aventure",
+  "nav": {
+    "expeditions": "Expéditions",
+    "tours": "Circuits",
+    "story": "Notre Histoire",
+    "basecamp": "Base Camp",
+    "tracking": "Suivi",
+    "entry": "Connexion",
+    "book": "Réserver",
+    "dashboard": "Tableau de bord",
+    "logout": "Déconnexion",
+    "guides": "Guides disponibles"
+  },
+  "hero": {
+    "badge": "Première Agence de Randonnée & Trekking d'Algérie",
+    "headline1": "TEHWISSA",
+    "headline2": "213",
+    "tagline": "Découvrez l'Algérie",
+    "subtitle": "Explorez la beauté sauvage de l'Algérie. Des sommets enneigés à 2 000 m aux sentiers d'art rupestre du Tassili — votre expédition commence ici.",
+    "searchPlaceholder": "Où voulez-vous randonner ?",
+    "exploreBtn": "Explorer",
+    "viewPeaks": "Voir les Sommets",
+    "startReservation": "Réserver",
+    "scroll": "Explorer"
+  },
+  "stats": {
+    "summits": "Sommets Atteints",
+    "miles": "Km de Sentiers",
+    "guides": "Guides Experts",
+    "safety": "Taux de Sécurité"
+  },
+  "trekTypes": {
+    "sectionLabel": "Chemins vers l'Aventure",
+    "heading": "CHOISISSEZ VOTRE VOIE",
+    "desc": "Nous classons nos expéditions par terrain et intensité. Que vous soyez grimpeur ou explorateur du désert, votre chemin est ici.",
+    "viewRoutes": "Voir les Itinéraires"
+  },
+  "packages": {
+    "sectionLabel": "SOMMETS SÉLECTIONNÉS",
+    "heading": "EXPÉDITIONS D'ÉLITE",
+    "viewAll": "Voir Toutes les Aventures"
+  },
+  "about": {
+    "label": "L'HÉRITAGE TEHWISSA 213",
+    "heading1": "NÉS DANS LES",
+    "heading2": "MONTAGNES.",
+    "desc": "Tehwissa 213 n'est pas qu'une simple plateforme — nous sommes une communauté de passionnés de montagne. Depuis 2009, nous avons guidé plus de 12 000 aventuriers à travers les terrains les plus beaux d'Algérie.",
+    "years": "Années d'Excellence",
+    "cta": "Notre Mission",
+    "why": {
+      "safety_title": "Sécurité Avant Tout",
+      "safety_desc": "Guides certifiés en premiers secours et suivi GPS satellitaire sur chaque expédition.",
+      "guides_title": "Guides Locaux Experts",
+      "guides_desc": "Des guides nés dans ces montagnes qui connaissent chaque sentier et chaque grotte.",
+      "eco_title": "Voyage Écologique",
+      "eco_desc": "Politique stricte 'Leave No Trace'. Nous protégeons la nature que nous aimons explorer.",
+      "photo_title": "Support Photographique",
+      "photo_desc": "Nos guides vous aident à capturer les plus beaux points de vue à l'heure dorée."
+    }
+  },
+  "contact": {
+    "label": "Contact Base Camp",
+    "heading1": "VOTRE SOMMET",
+    "heading2": "VOUS ATTEND.",
+    "desc": "Ne rêvez plus des paysages — vivez-les. Nos experts sont prêts à concevoir votre itinéraire idéal.",
+    "call": "Appelez-Nous",
+    "booking": "Réservation Rapide",
+    "hq": "SIÈGE SOCIAL",
+    "findBasecamp": "TROUVER LA BASE",
+    "office": "Bureau des Expéditions",
+    "emergency": "Ligne d'Urgence",
+    "comms": "Email",
+    "ops": "Horaires"
+  }
+}
