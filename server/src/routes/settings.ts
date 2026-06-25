@@ -64,7 +64,7 @@ router.put(
     if (existing.length > 0) {
       [updated] = await db.update(agencySettings).set(updates).where(eq(agencySettings.id, existing[0].id)).returning();
     } else {
-      [updated] = await db.insert(agencySettings).values(updates as Parameters<typeof agencySettings.$inferInsert>[0]).returning();
+      [updated] = await db.insert(agencySettings).values(updates as any).returning();
     }
 
     await db.insert(activityLogs).values({

@@ -178,7 +178,7 @@ async function seed() {
   ];
 
   for (const r of sampleReservations) {
-    const [inserted] = await db.insert(reservations).values(r as Parameters<typeof db.insert>[1]).returning();
+    const [inserted] = await db.insert(reservations).values(r as any).returning();
     await db.insert(reservationLogs).values({ reservationId: inserted.id, toStatus: r.status, note: "Initial status" });
   }
   console.log("✓ Sample reservations created (8 reservations)");
