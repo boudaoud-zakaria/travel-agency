@@ -1,0 +1,41 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Tehwissa 213 – Travel Agency App
+# Single-container deployment: Express serves API + React SPA
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tehwissa213-app:latest
+    container_name: tehwissa213-app
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-3001}:3001"
+    volumes:
+      # Persist the SQLite database between container restarts/upgrades
+      - db-data:/app/.local
+      # Persist uploaded files (ID cards, logos)
+      - uploads-data:/app/uploads
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      STATIC_DIR: /app/public
+      # ── CHANGE THESE IN PRODUCTION ──
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-a-long-random-string}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  db-data:
+    driver: local
+  uploads-data:
+    driver: local

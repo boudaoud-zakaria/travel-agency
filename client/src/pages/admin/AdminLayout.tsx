@@ -3,7 +3,7 @@ import { useUser, useLogout } from "@/hooks/use-auth";
 import {
   LayoutDashboard, Package, Calendar, Users, Settings, LogOut,
   Plane, Bell, ChevronDown, Menu, X,
-  Globe, ChevronRight, ClipboardList, BarChart3, UserCheck
+  Globe, ChevronRight, ClipboardList, BarChart3, UserCheck, Compass,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ const adminNav: NavItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/reservations", icon: Calendar, label: "Reservations", badge: 18 },
   { href: "/admin/packages", icon: Package, label: "Packages" },
+  { href: "/admin/custom-requests", icon: Compass, label: "Custom Requests" },
   { href: "/admin/employees", icon: Users, label: "Employees" },
   { href: "/admin/schedule", icon: ClipboardList, label: "Schedule" },
   { href: "/admin/settings", icon: Settings, label: "Settings" },

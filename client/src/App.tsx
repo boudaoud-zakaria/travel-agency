@@ -21,6 +21,7 @@ import AdminPackages from "@/pages/admin/AdminPackages";
 import AdminEmployees from "@/pages/admin/AdminEmployees";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import AdminSchedule from "@/pages/admin/AdminSchedule";
+import AdminCustomRequests from "@/pages/admin/AdminCustomRequests";
 
 // Employee Pages
 import EmployeeLayout from "@/pages/employee/EmployeeLayout";
@@ -71,6 +72,11 @@ function Router() {
       <Route path="/admin/schedule">
         <AdminLayout>
           <AdminSchedule />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/custom-requests">
+        <AdminLayout>
+          <AdminCustomRequests />
         </AdminLayout>
       </Route>
 

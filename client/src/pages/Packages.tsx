@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PackageCard } from "@/components/packages/PackageCard";
 import { usePackages } from "@/hooks/use-packages";
 import { Input } from "@/components/ui/input";
+import CustomRequestForm from "@/components/CustomRequestForm";
 import {
   Select,
   SelectContent,
@@ -31,6 +32,7 @@ export default function Packages() {
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+  const [customFormOpen, setCustomFormOpen] = useState(false);
 
   const { data: packages, isLoading } = usePackages({
     status: "ACTIVE",
@@ -253,7 +255,30 @@ export default function Packages() {
         </div>
       </main>
 
+      {/* Custom expedition CTA banner */}
+      <div className="bg-primary/5 border-t border-primary/10 py-12">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div>
+            <div className="text-xs font-black uppercase tracking-widest text-primary mb-2">Can't find what you're looking for?</div>
+            <h3 className="text-2xl md:text-3xl font-black text-foreground">Design a Custom Expedition</h3>
+            <p className="text-muted-foreground text-sm mt-1 max-w-md">
+              Tell us your dream destination, dates and group size — our team will craft a personalised package just for you.
+            </p>
+          </div>
+          <Button
+            onClick={() => setCustomFormOpen(true)}
+            size="lg"
+            className="h-14 px-10 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 text-xs uppercase tracking-widest gap-2 shrink-0 hover:bg-primary/90"
+          >
+            <Compass className="w-4 h-4" />
+            Request Custom Trip
+          </Button>
+        </div>
+      </div>
+
       <Footer />
+
+      <CustomRequestForm open={customFormOpen} onClose={() => setCustomFormOpen(false)} />
 
       <style>{`
         .animate-spin-slow {

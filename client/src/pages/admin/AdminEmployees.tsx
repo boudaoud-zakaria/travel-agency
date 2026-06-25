@@ -1,9 +1,13 @@
 import { useState } from "react";
 import {
-    Plus, Search, Edit2, Ban, UserCheck,
+    Plus, Search, Edit2, Ban, UserCheck, Trash2,
     ChevronLeft, ChevronRight, Shield, User, Mail, Phone,
     Activity, Loader2, Package, Clock, CheckCircle
 } from "lucide-react";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -18,9 +22,11 @@ import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import { useActivityLog } from "@/hooks/use-activity-log";
 import { useAdminSchedule } from "@/hooks/use-admin-schedule";
-import { useEmployees, useCreateEmployee, useUpdateEmployee, useToggleEmployeeStatus } from "@/hooks/use-employees";
+import { useEmployees, useCreateEmployee, useUpdateEmployee, useToggleEmployeeStatus, useDeleteEmployee } from "@/hooks/use-employees";
 import { usePackages } from "@/hooks/use-packages";
+import { useUser } from "@/hooks/use-auth";
 import ActivityFeed from "@/components/admin/ActivityFeed";
+import { useToast } from "@/hooks/use-toast";
 
 const roleConfig: Record<string, { label: string; class: string }> = {
     EMPLOYEE: { label: "Employee", class: "bg-blue-100 text-blue-800 border-blue-200" },
@@ -35,6 +41,7 @@ export default function AdminEmployees() {
     const [page, setPage] = useState(1);
     const [drawerEmp, setDrawerEmp] = useState<any>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
     const { data: activityLogs } = useActivityLog(drawerEmp?.id);
     const { employees: scheduleEmployees } = useAdminSchedule();
@@ -44,10 +51,14 @@ export default function AdminEmployees() {
         ? scheduleEmployees.find(e => e.id === drawerEmp.id)
         : null;
 
+    const { data: currentUser } = useUser();
+    const isSuperAdmin = (currentUser as any)?.role === "SUPER_ADMIN";
+    const { toast } = useToast();
     const { data: empData, isLoading: empLoading } = useEmployees();
     const createEmployee = useCreateEmployee();
     const updateEmployee = useUpdateEmployee();
     const toggleStatus = useToggleEmployeeStatus();
+    const deleteEmployee = useDeleteEmployee();
     const { data: pkgData } = usePackages();
 
     const employees: any[] = (empData as any[]) ?? [];
@@ -226,7 +237,7 @@ export default function AdminEmployees() {
                                                 <button
                                                     onClick={() => toggleActive(emp.id)}
                                                     className={`p-1.5 rounded-lg transition-colors ${emp.isActive
-                                                            ? "hover:bg-red-50 text-muted-foreground hover:text-red-500"
+                                                            ? "hover:bg-amber-50 text-muted-foreground hover:text-amber-600"
                                                             : "hover:bg-emerald-50 text-muted-foreground hover:text-emerald-500"
                                                         }`}
                                                     title={emp.isActive ? "Deactivate" : "Activate"}
@@ -234,6 +245,15 @@ export default function AdminEmployees() {
                                                 >
                                                     {emp.isActive ? <Ban className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                                                 </button>
+                                                {isSuperAdmin && (
+                                                    <button
+                                                        onClick={() => setDeleteTarget(emp)}
+                                                        className="p-1.5 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors"
+                                                        title="Delete permanently"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </motion.tr>
@@ -420,6 +440,41 @@ export default function AdminEmployees() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Hard Delete Confirmation */}
+            <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                            <Trash2 className="w-5 h-5" /> Permanently Delete User?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <strong>"{deleteTarget?.name}"</strong> ({deleteTarget?.email}) will be permanently removed.
+                            Their reservations will be unassigned. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (!deleteTarget) return;
+                                deleteEmployee.mutate(deleteTarget.id, {
+                                    onSuccess: () => {
+                                        toast({ title: "User permanently deleted" });
+                                        setDeleteTarget(null);
+                                        if (drawerEmp?.id === deleteTarget.id) setDrawerOpen(false);
+                                    },
+                                    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+                                });
+                            }}
+                            className="bg-destructive text-white hover:bg-destructive/90"
+                            disabled={deleteEmployee.isPending}
+                        >
+                            {deleteEmployee.isPending ? "Deleting…" : "Delete Permanently"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

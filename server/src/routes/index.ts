@@ -10,6 +10,7 @@ import notificationsRouter from "./notifications";
 import contactRouter from "./contact";
 import testimonialsRouter from "./testimonials";
 import settingsRouter from "./settings";
+import customRequestsRouter from "./custom-requests";
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use("/notifications", notificationsRouter);
 router.use("/contact", contactRouter);
 router.use("/testimonials", testimonialsRouter);
 router.use("/settings", settingsRouter);
+router.use("/custom-requests", customRequestsRouter);
 
 export default router;

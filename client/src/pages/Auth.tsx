@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Eye, EyeOff, Shield, Mountain, Zap, Compass, Map, ShieldCheck, ArrowRight } from "lucide-react";
+import { Loader2, Eye, EyeOff, ArrowRight, Mountain, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -22,10 +22,10 @@ export default function Auth() {
   const onSubmit = (data: any) => {
     login(data, {
       onSuccess: (user: any) => {
-        toast({ title: "Welcome back, Guide!", description: `Authenticated as ${user.name}` });
-        if (user.role === 'SUPER_ADMIN') {
+        toast({ title: "Welcome back!", description: `Signed in as ${user.name}` });
+        if (user.role === "SUPER_ADMIN") {
           setLocation("/admin");
-        } else if (user.role === 'EMPLOYEE') {
+        } else if (user.role === "EMPLOYEE") {
           setLocation("/employee");
         } else {
           setLocation("/");
@@ -33,243 +33,206 @@ export default function Auth() {
       },
       onError: (err: any) => {
         toast({
-          title: "Access Denied",
-          description: err.message || "Invalid expedition credentials",
-          variant: "destructive"
+          title: "Sign-in failed",
+          description: err.message || "Invalid email or password.",
+          variant: "destructive",
         });
-      }
+      },
     });
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-background">
-
-      {/* Left: Form */}
-      <div className="flex items-center justify-center px-8 lg:px-20 py-16">
-        <div className="w-full max-w-md">
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
-            <a href="/" className="inline-flex items-center gap-4 group">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:scale-105 transition-all">
-                <Mountain className="w-7 h-7 text-white" />
-              </div>
-              <div className="text-left">
-                <div className="text-2xl font-black text-primary uppercase tracking-tighter leading-none" style={{ fontFamily: "'Inter', sans-serif" }}>Travel Genius</div>
-                <div className="text-[10px] font-black tracking-[4px] text-emerald-600 uppercase leading-none mt-1">Adventure HQ</div>
-              </div>
-            </a>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <div className="mb-10">
-              <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase leading-none mb-3">Staff Portal</h1>
-              <p className="text-muted-foreground font-medium text-lg">Initialize expedition command link.</p>
+    <div className="min-h-screen flex bg-white">
+      {/* ── Left panel: form ── */}
+      <div className="flex flex-col justify-center w-full max-w-md mx-auto px-8 py-16 lg:mx-0 lg:px-16">
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
+        >
+          <a href="/" className="inline-flex items-center gap-3 group">
+            <div className="w-11 h-11 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:scale-105 transition-transform">
+              <Mountain className="w-6 h-6 text-white" />
             </div>
-
-            {/* Demo credentials hint */}
-            <div className="mb-8 p-6 rounded-3xl bg-primary/5 border border-primary/10 shadow-sm relative overflow-hidden group">
-               <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <ShieldCheck className="w-12 h-12" />
-               </div>
-              <div className="flex items-start gap-4 relative z-10">
-                <Shield className="w-5 h-5 text-primary mt-1 shrink-0" />
-                <div className="text-xs text-primary/80 font-medium">
-                  <span className="font-black uppercase tracking-widest text-[10px]">Demo Protocol:</span><br />
-                  <div className="mt-2 space-y-1">
-                    <div>Admin: <span className="font-black text-primary">admin@travelgenius.dz</span></div>
-                    <div>Pass: <span className="font-black text-primary">Admin@123456</span></div>
-                  </div>
-                </div>
-              </div>
+            <div>
+              <div className="text-xl font-black text-primary tracking-tight leading-none">Tehwissa 213</div>
+              <div className="text-[10px] font-bold tracking-[3px] text-muted-foreground uppercase mt-0.5">Staff Portal</div>
             </div>
+          </a>
+        </motion.div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Staff Identifier (Email)</Label>
-                <div className="relative group">
-                  <Input
-                    id="username"
-                    type="email"
-                    placeholder="name@travelgenius.dz"
-                    {...register("username", {
-                      required: "Staff email is required",
-                      pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Valid communication link required" }
-                    })}
-                    className={`h-14 px-5 rounded-2xl text-sm font-bold border-border/50 bg-muted/20 focus-visible:ring-primary/10 ${errors.username ? 'border-destructive' : 'group-hover:border-primary/30'}`}
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-opacity">
-                    <Zap className="w-4 h-4 text-emerald-500" />
-                  </div>
-                </div>
-                {errors.username && (
-                  <p className="text-[10px] font-black uppercase tracking-widest text-destructive ml-1">{errors.username.message as string}</p>
-                )}
-              </div>
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          className="mb-10"
+        >
+          <h1 className="text-3xl font-black text-foreground tracking-tight mb-2">Sign in</h1>
+          <p className="text-muted-foreground text-sm">Access the admin and operations dashboard.</p>
+        </motion.div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between ml-1">
-                  <Label htmlFor="password" className="text-xs font-black uppercase tracking-widest text-muted-foreground">Encryption Key (Pass)</Label>
-                  <a href="#" className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-emerald-600 transition-colors">Reset Key</a>
-                </div>
-                <div className="relative group">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    {...register("password", { required: "Key is required" })}
-                    className={`h-14 px-5 rounded-2xl text-sm font-bold pr-14 border-border/50 bg-muted/20 focus-visible:ring-primary/10 ${errors.password ? 'border-destructive' : 'group-hover:border-primary/30'}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-[10px] font-black uppercase tracking-widest text-destructive ml-1">{errors.password.message as string}</p>
-                )}
-              </div>
+        {/* Form */}
+        <motion.form
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-5"
+        >
+          {/* Email */}
+          <div className="space-y-1.5">
+            <Label htmlFor="username" className="text-sm font-semibold text-foreground">
+              Email address
+            </Label>
+            <Input
+              id="username"
+              type="email"
+              placeholder="you@tehwissa213.dz"
+              autoComplete="email"
+              {...register("username", {
+                required: "Email is required",
+                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
+              })}
+              className={`h-12 rounded-xl border-border/60 bg-muted/30 text-sm font-medium focus-visible:ring-primary/20 ${
+                errors.username ? "border-destructive focus-visible:ring-destructive/20" : ""
+              }`}
+            />
+            {errors.username && (
+              <p className="text-xs text-destructive font-medium">{errors.username.message as string}</p>
+            )}
+          </div>
 
-              <Button
-                type="submit"
-                className="w-full h-16 text-xs font-black uppercase tracking-[0.2em] bg-primary text-white hover:bg-primary/95 shadow-2xl shadow-primary/20 border-0 rounded-2xl transition-all active:scale-95 group"
-                disabled={isPending}
+          {/* Password */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-sm font-semibold text-foreground">
+                Password
+              </Label>
+            </div>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                {...register("password", { required: "Password is required" })}
+                className={`h-12 rounded-xl border-border/60 bg-muted/30 text-sm font-medium pr-12 focus-visible:ring-primary/20 ${
+                  errors.password ? "border-destructive focus-visible:ring-destructive/20" : ""
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {isPending ? (
-                  <>
-                    <Loader2 className="animate-spin mr-3 h-5 w-5" />
-                    Authenticating...
-                  </>
-                ) : (
-                  <span className="flex items-center">
-                    Enter Headquarters <ArrowRight className="w-5 h-5 ml-3 transition-transform group-hover:translate-x-1" />
-                  </span>
-                )}
-              </Button>
-            </form>
-
-            <div className="mt-12 pt-8 border-t border-border/50 text-center">
-              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Off-Duty Alpinist? </span>
-              <a href="/" className="text-xs font-black text-primary uppercase tracking-widest hover:text-emerald-600 ml-2 border-b-2 border-primary/20 pb-0.5 transition-colors">
-                Return to Surface
-              </a>
+                {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+              </button>
             </div>
-          </motion.div>
-        </div>
+            {errors.password && (
+              <p className="text-xs text-destructive font-medium">{errors.password.message as string}</p>
+            )}
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="w-full h-12 rounded-xl text-sm font-bold bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] mt-2 group"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                Signing in…
+              </>
+            ) : (
+              <span className="flex items-center gap-2">
+                Sign in
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            )}
+          </Button>
+        </motion.form>
+
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-10 pt-8 border-t border-border/40 text-center"
+        >
+          <a href="/" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium">
+            ← Back to website
+          </a>
+        </motion.div>
       </div>
 
-      {/* Right: Visual */}
-      <div className="hidden lg:relative lg:flex items-end bg-[#0B0D11] overflow-hidden">
+      {/* ── Right panel: visual ── */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-[#0b0e14]">
+        {/* Background image */}
         <motion.img
-          initial={{ scale: 1.1 }}
+          initial={{ scale: 1.06 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 10, repeat: Infinity, repeatType: "mirror" }}
-          src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&auto=format&fit=crop&q=80"
-          alt="Expedition HQ"
-          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          transition={{ duration: 12, repeat: Infinity, repeatType: "mirror" }}
+          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&auto=format&fit=crop&q=80"
+          alt="Algerian mountains"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/80 to-emerald-950 opacity-90" />
-        
-        {/* Topographic Lines Decoration */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-           <svg viewBox="0 0 100 100" className="w-full h-full text-white fill-none stroke-current stroke-[0.1]">
-              <path d="M0 20 Q30 40 60 20 T100 30" />
-              <path d="M0 40 Q30 60 60 40 T100 50" />
-              <path d="M0 60 Q30 80 60 60 T100 70" />
-           </svg>
-        </div>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-emerald-900/90" />
 
-        {/* Floating status cards */}
-        <div className="absolute top-1/4 left-12 right-12 space-y-6 z-20">
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.7 }}
-            className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-3xl"
-          >
-            <div className="flex items-center justify-between mb-8">
-               <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]"></div>
-                  <span className="text-white font-black text-[10px] tracking-[4px] uppercase">HQ Real-Time Status</span>
-               </div>
-               <div className="text-white/40 text-[10px] font-black uppercase tracking-widest">Basecamp-01</div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-8">
-              {[
-                { label: "Active Expeditions", value: "24", icon: Mountain },
-                { label: "Operational Fleet", value: "14", icon: Map },
-                { label: "Guides On-Duty", value: "38", icon: ShieldCheck },
-                { label: "Revenue Delta", value: "+12.4%", icon: Zap },
-              ].map((stat, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex items-center gap-2 text-white/40 mb-1">
-                     <stat.icon className="w-3.5 h-3.5" />
-                     <span className="text-[9px] font-black uppercase tracking-widest">{stat.label}</span>
-                  </div>
-                  <div className="text-white font-black text-3xl tracking-tighter">{stat.value}</div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-            className="bg-emerald-500/10 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/20 flex items-center justify-between"
-          >
-             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-xl shadow-emerald-500/20">
-                   <Compass className="animate-spin-slow w-6 h-6" />
-                </div>
-                <div>
-                   <div className="text-white font-black text-xs uppercase tracking-widest">GPS Uplink Active</div>
-                   <div className="text-emerald-400 text-[10px] font-bold">Secure connection established.</div>
-                </div>
-             </div>
-             <div className="bg-emerald-500/20 px-3 py-1 rounded-full text-[9px] font-black text-emerald-400 uppercase tracking-widest">Standby</div>
-          </motion.div>
-        </div>
-
-        <div className="relative z-10 p-16 pb-20 text-white w-full">
-          <div className="mb-6 flex items-center gap-3">
-             <span className="h-px w-10 bg-emerald-500" />
-             <span className="text-[10px] font-black uppercase tracking-[5px] text-emerald-500">OPERATIONAL ACCESS</span>
-          </div>
-          <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tighter uppercase leading-none">
-            Travel Genius<br />Expedition HQ
-          </h2>
-          <p className="text-white/50 max-w-sm leading-relaxed text-sm font-medium">
-            Command and control center for high-altitude trekking operations and Sahara logistics across North Africa.
-          </p>
-          <div className="flex gap-4 mt-10">
-            {["🏔️ Alpine", "🏜️ Sahara", "🌲 Forest", "⛺ Wild"].map((tag) => (
-              <span key={tag} className="bg-white/5 backdrop-blur-md px-4 py-2 rounded-xl text-[10px] font-black text-white/70 border border-white/10 uppercase tracking-widest">{tag}</span>
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-end p-16 pb-20 text-white w-full">
+          {/* Destination tags */}
+          <div className="flex flex-wrap gap-2 mb-10">
+            {[
+              { icon: "🏔️", label: "Djurdjura" },
+              { icon: "🏜️", label: "Tassili N'Ajjer" },
+              { icon: "🌊", label: "El Kala" },
+              { icon: "🕌", label: "Timgad" },
+            ].map(({ icon, label }) => (
+              <span
+                key={label}
+                className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold border border-white/15"
+              >
+                {icon} {label}
+              </span>
             ))}
           </div>
+
+          <h2 className="text-5xl font-black tracking-tight leading-[1.05] mb-5">
+            Explore Algeria<br />with Tehwissa 213
+          </h2>
+          <p className="text-white/60 text-sm leading-relaxed max-w-xs font-medium mb-8">
+            Curated expeditions across the Sahara, mountains and ancient ruins of Algeria — trusted by thousands since 2009.
+          </p>
+
+          {/* Stats row */}
+          <div className="flex gap-8">
+            {[
+              { value: "12K+", label: "Adventurers" },
+              { value: "8", label: "Destinations" },
+              { value: "15+", label: "Years" },
+            ].map(({ value, label }) => (
+              <div key={label}>
+                <div className="text-2xl font-black">{value}</div>
+                <div className="text-xs text-white/50 font-semibold uppercase tracking-wider mt-0.5">{label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom badge */}
+          <div className="absolute bottom-8 right-8 flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-2xl px-4 py-3 border border-white/15">
+            <MapPin className="w-4 h-4 text-emerald-400" />
+            <div>
+              <div className="text-xs font-bold text-white">Algiers HQ</div>
+              <div className="text-[10px] text-white/50 font-medium">hq@tehwissa213.dz</div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style>{`
-        .animate-spin-slow {
-          animation: spin 8s linear infinite;
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

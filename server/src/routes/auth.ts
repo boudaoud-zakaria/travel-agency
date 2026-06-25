@@ -33,19 +33,22 @@ router.post(
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Update last login
-    await db.update(users)
-      .set({ lastLoginAt: new Date().toISOString() })
-      .where(eq(users.id, user.id));
+    // Update last login + activity log — non-critical, don't block login on failure
+    try {
+      await db.update(users)
+        .set({ lastLoginAt: new Date().toISOString() })
+        .where(eq(users.id, user.id));
 
-    // Log activity
-    await db.insert(activityLogs).values({
-      userId: user.id,
-      employeeName: user.name,
-      action: `${user.name} logged in`,
-      entityType: "user",
-      entityId: user.id,
-    });
+      await db.insert(activityLogs).values({
+        userId: user.id,
+        employeeName: user.name,
+        action: `${user.name} logged in`,
+        entityType: "user",
+        entityId: user.id,
+      });
+    } catch (logErr) {
+      console.warn("[auth] Could not update last_login_at or activity log:", (logErr as Error).message);
+    }
 
     const token = generateToken({
       userId: user.id,

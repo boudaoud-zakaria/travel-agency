@@ -5,6 +5,14 @@ import {
     CalendarDays, ShieldCheck, Trash2, X, AlertCircle, Mountain,
     BarChart3, ImageIcon, Upload, TrendingUp, DollarSign
 } from "lucide-react";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useUser } from "@/hooks/use-auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { packagesHardDelete } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -191,6 +199,19 @@ export default function AdminPackages() {
     const createPackage = useCreatePackage();
     const updatePackage = useUpdatePackage();
     const deletePackage = useDeletePackage();
+    const { data: currentUser } = useUser();
+    const isSuperAdmin = (currentUser as any)?.role === "SUPER_ADMIN";
+    const { toast } = useToast();
+    const qc = useQueryClient();
+    const hardDelete = useMutation({
+        mutationFn: packagesHardDelete,
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["/api/packages"] });
+            toast({ title: "Package permanently deleted" });
+            setHardDeleteTarget(null);
+        },
+        onError: (err: any) => toast({ title: "Cannot delete", description: err.message, variant: "destructive" }),
+    });
 
     const packages = ((pkgData as any[]) ?? []).map(normalizePkg);
 
@@ -203,6 +224,7 @@ export default function AdminPackages() {
     const [newRequirement, setNewRequirement] = useState("");
     const [statsModal, setStatsModal] = useState(false);
     const [statsPkg, setStatsPkg] = useState<any>(null);
+    const [hardDeleteTarget, setHardDeleteTarget] = useState<any>(null);
     const mainImageRef = useRef<HTMLInputElement>(null);
     const secImageRef = useRef<HTMLInputElement>(null);
 
@@ -503,10 +525,20 @@ export default function AdminPackages() {
                                             <button
                                                 onClick={() => archivePkg(pkg.id)}
                                                 disabled={deletePackage.isPending}
-                                                className="p-2 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-50"
+                                                className="p-2 rounded-lg hover:bg-amber-50 text-muted-foreground hover:text-amber-600 transition-colors disabled:opacity-50"
+                                                title="Archive"
                                             >
                                                 <Archive className="w-4 h-4" />
                                             </button>
+                                            {isSuperAdmin && (
+                                                <button
+                                                    onClick={() => setHardDeleteTarget(pkg)}
+                                                    className="p-2 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors"
+                                                    title="Delete permanently"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -572,10 +604,20 @@ export default function AdminPackages() {
                                             <button
                                                 onClick={() => archivePkg(pkg.id)}
                                                 disabled={deletePackage.isPending}
-                                                className="p-1.5 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-50"
+                                                className="p-1.5 rounded-lg hover:bg-amber-50 text-muted-foreground hover:text-amber-600 transition-colors disabled:opacity-50"
+                                                title="Archive"
                                             >
                                                 <Archive className="w-4 h-4" />
                                             </button>
+                                            {isSuperAdmin && (
+                                                <button
+                                                    onClick={() => setHardDeleteTarget(pkg)}
+                                                    className="p-1.5 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors"
+                                                    title="Delete permanently"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
@@ -851,6 +893,30 @@ export default function AdminPackages() {
                 open={statsModal}
                 onClose={() => setStatsModal(false)}
             />
+
+            {/* Hard Delete Confirmation */}
+            <AlertDialog open={!!hardDeleteTarget} onOpenChange={() => setHardDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                            <Trash2 className="w-5 h-5" /> Permanently Delete Package?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <strong>"{hardDeleteTarget?.titleEn}"</strong> will be permanently removed from the database.
+                            This action cannot be undone. Packages with active reservations cannot be deleted.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => hardDeleteTarget && hardDelete.mutate(hardDeleteTarget.id)}
+                            className="bg-destructive text-white hover:bg-destructive/90"
+                        >
+                            {hardDelete.isPending ? "Deleting…" : "Delete Permanently"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

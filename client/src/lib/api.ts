@@ -268,3 +268,42 @@ export const settingsApi = {
       body: JSON.stringify(data),
     }),
 };
+
+// ── Custom Requests ───────────────────────────────────────────────────────────
+export interface CustomRequestPayload {
+  name: string;
+  email: string;
+  phone: string;
+  destination: string;
+  dateFrom: string;
+  dateTo: string;
+  groupSize: number;
+  budget?: string;
+  activityType: string;
+  requirements?: string;
+  message: string;
+}
+
+export const customRequestsApi = {
+  submit: (data: CustomRequestPayload) =>
+    request<Record<string, unknown>>("/custom-requests", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  list: () => request<Record<string, unknown>[]>("/custom-requests"),
+
+  update: (id: number, data: { status?: string; adminNotes?: string }) =>
+    request<Record<string, unknown>>(`/custom-requests/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: number) =>
+    request<{ message: string }>(`/custom-requests/${id}`, { method: "DELETE" }),
+};
+
+// ── Package hard delete ────────────────────────────────────────────────────────
+export const packagesHardDelete = (id: number) =>
+  request<{ message: string }>(`/packages/${id}/hard`, { method: "DELETE" });
+

@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { motion, useInView } from "framer-motion";
 import {
   ArrowRight, MapPin, Clock,
-  Shield, Award, HeartHandshake, Globe, Phone, Mountain, Tent, Trees, Wind, Camera, ChevronRight
+  Shield, Award, HeartHandshake, Globe, Phone, Mountain, Tent, Trees, Wind, Camera, ChevronRight,
+  Compass, Star, Users, Calendar,
 } from "lucide-react";
 import { Link } from "wouter";
-import { useRef, useState, useEffect } from "react"; // useState used in AnimatedCounter
+import { useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import CustomRequestForm from "@/components/CustomRequestForm";
 
 /* ── Animated Counter ─────────────────────────────────────── */
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -64,6 +66,7 @@ export default function Home() {
   const { t } = useTranslation();
   const { data: packages, isLoading } = usePackages({ status: "ACTIVE" });
   const featuredPackages = packages?.slice(0, 3) || [];
+  const [customFormOpen, setCustomFormOpen] = useState(false);
 
   const packageTypes = [
     {
@@ -367,6 +370,72 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ─── EXPÉDITIONS D'ÉLITE / CUSTOM OUTING REQUEST ─── */}
+        <section className="py-24 bg-primary relative overflow-hidden">
+          {/* Decorative background */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
+            <svg viewBox="0 0 200 100" className="w-full h-full fill-none stroke-white stroke-[0.3]">
+              <path d="M0 30 Q50 10 100 35 T200 25" />
+              <path d="M0 50 Q50 30 100 55 T200 45" />
+              <path d="M0 70 Q50 50 100 75 T200 65" />
+            </svg>
+          </div>
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&auto=format&fit=crop&q=60')] bg-cover bg-center opacity-10" />
+
+          <div className="container mx-auto px-4 relative z-10">
+            <FadeSection>
+              <div className="max-w-4xl mx-auto text-center text-white mb-14">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-black uppercase tracking-[3px] mb-6">
+                  <Star className="w-3 h-3 fill-white text-white" /> Expéditions D'Élite
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.95] mb-6">
+                  Your Adventure,<br />Your Rules.
+                </h2>
+                <p className="text-white/65 text-lg font-medium max-w-2xl mx-auto leading-relaxed">
+                  Can't find the perfect package? Let us craft a fully personalised expedition just for you.
+                  Tell us your dream — we'll make it happen.
+                </p>
+              </div>
+            </FadeSection>
+
+            {/* Feature cards */}
+            <div className="grid md:grid-cols-3 gap-5 mb-14">
+              {[
+                { icon: Compass, title: "Any Destination", desc: "From the Sahara to the highest peaks of Djurdjura — your choice, our expertise." },
+                { icon: Users, title: "Any Group Size", desc: "Solo adventure, family trip, or corporate retreat. We tailor every detail." },
+                { icon: Calendar, title: "Your Dates", desc: "Travel when it suits you, not when we schedule. Full flexibility guaranteed." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <FadeSection key={title}>
+                  <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-3xl p-7 text-white hover:bg-white/15 transition-colors">
+                    <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center mb-5">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-black mb-2">{title}</h3>
+                    <p className="text-white/60 text-sm leading-relaxed font-medium">{desc}</p>
+                  </div>
+                </FadeSection>
+              ))}
+            </div>
+
+            <FadeSection>
+              <div className="text-center">
+                <Button
+                  onClick={() => setCustomFormOpen(true)}
+                  size="lg"
+                  className="h-16 px-12 bg-white text-primary hover:bg-white/90 font-black rounded-2xl shadow-2xl shadow-black/20 text-sm uppercase tracking-widest gap-3 group"
+                >
+                  <Compass className="w-5 h-5" />
+                  Design My Custom Expedition
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <p className="text-white/40 text-xs font-medium mt-4">
+                  Free consultation · Response within 24–48 hours
+                </p>
+              </div>
+            </FadeSection>
+          </div>
+        </section>
+
         {/* ─── ABOUT / WHY CHOOSE US ───────────────────────── */}
         <section className="py-32 bg-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full opacity-5 pointer-events-none">
@@ -523,6 +592,8 @@ export default function Home() {
       </main>
 
       <Footer />
+
+      <CustomRequestForm open={customFormOpen} onClose={() => setCustomFormOpen(false)} />
 
       <style>{`
         @keyframes heroZoom {

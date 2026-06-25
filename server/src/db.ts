@@ -175,6 +175,25 @@ const TABLES_SQL = [
     performance_score REAL DEFAULT 0,
     UNIQUE(employee_id, month, year)
   )`,
+
+  `CREATE TABLE IF NOT EXISTS custom_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    date_from TEXT NOT NULL,
+    date_to TEXT NOT NULL,
+    group_size INTEGER NOT NULL DEFAULT 1,
+    budget TEXT,
+    activity_type TEXT NOT NULL DEFAULT 'custom',
+    requirements TEXT,
+    message TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    admin_notes TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`,
 ];
 
 export async function initializeDatabase() {

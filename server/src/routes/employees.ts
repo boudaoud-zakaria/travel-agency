@@ -172,7 +172,7 @@ router.patch(
   })
 );
 
-// DELETE /api/employees/:id — soft delete
+// DELETE /api/employees/:id — hard delete (SUPER_ADMIN only)
 router.delete(
   "/:id",
   requireAuth,
@@ -186,17 +186,27 @@ router.delete(
 
     if (id === req.user!.userId) return res.status(400).json({ message: "Cannot delete your own account" });
 
-    await db.update(users).set({ isActive: false }).where(eq(users.id, id));
+    // Nullify FK references before hard delete so constraints don't fail
+    await db.update(reservations).set({ assignedToId: null }).where(eq(reservations.assignedToId, id));
+
+    // Remove schedule entry
+    await db.delete(employeeSchedules).where(eq(employeeSchedules.employeeId, id));
+
+    // Remove notifications
+    await db.delete(notifications).where(eq(notifications.userId, id));
+
+    // Hard delete the user
+    await db.delete(users).where(eq(users.id, id));
 
     await db.insert(activityLogs).values({
       userId: req.user!.userId,
       employeeName: req.user!.name,
-      action: `Deleted employee: ${existing.name}`,
+      action: `Permanently deleted user: ${existing.name}`,
       entityType: "user",
       entityId: id,
     });
 
-    return res.json({ message: "Employee removed successfully" });
+    return res.json({ message: "User permanently deleted" });
   })
 );
 

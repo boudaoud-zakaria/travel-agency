@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { eq, like, and, or } from "drizzle-orm";
 import { db, parseJSON, toJSON } from "../db";
-import { travelPackages, activityLogs } from "../schema";
+import { travelPackages, activityLogs, reservations } from "../schema";
 import { requireAuth, requireAdmin } from "../middleware/auth";
 import { asyncHandler } from "../middleware/error";
 
@@ -184,6 +184,41 @@ router.delete(
     });
 
     return res.json({ message: "Package archived successfully" });
+  })
+);
+
+// DELETE /api/packages/:id/hard — permanent hard delete (SUPER_ADMIN only)
+router.delete(
+  "/:id/hard",
+  requireAuth,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ message: "Invalid package ID" });
+
+    const [existing] = await db.select().from(travelPackages).where(eq(travelPackages.id, id));
+    if (!existing) return res.status(404).json({ message: "Package not found" });
+
+    // Block deletion if there are non-cancelled/rejected reservations
+    const linked = await db.select().from(reservations).where(eq(reservations.packageId, id));
+    const active = linked.filter(r => !["REJECTED", "CANCELLED"].includes(r.status));
+    if (active.length > 0) {
+      return res.status(409).json({
+        message: `Cannot delete: ${active.length} active reservation(s) linked to this package. Archive it instead.`,
+      });
+    }
+
+    await db.delete(travelPackages).where(eq(travelPackages.id, id));
+
+    await db.insert(activityLogs).values({
+      userId: req.user!.userId,
+      employeeName: req.user!.name,
+      action: `Permanently deleted package: ${existing.titleEn}`,
+      entityType: "package",
+      entityId: id,
+    });
+
+    return res.json({ message: "Package permanently deleted" });
   })
 );
 

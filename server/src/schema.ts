@@ -155,3 +155,23 @@ export const employeeStats = sqliteTable("employee_stats", {
   confirmationRate: real("confirmation_rate").default(0),
   performanceScore: real("performance_score").default(0),
 });
+
+// PENDING | REVIEWING | QUOTED | ACCEPTED | REJECTED
+export const customRequests = sqliteTable("custom_requests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  destination: text("destination").notNull(),
+  dateFrom: text("date_from").notNull(),
+  dateTo: text("date_to").notNull(),
+  groupSize: integer("group_size").notNull().default(1),
+  budget: text("budget"),
+  activityType: text("activity_type").notNull().default("custom"),
+  requirements: text("requirements"),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("PENDING"),
+  adminNotes: text("admin_notes"),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+  updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
+});
