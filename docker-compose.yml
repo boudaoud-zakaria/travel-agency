@@ -14,7 +14,7 @@ services:
     container_name: tehwissa213-app
     restart: unless-stopped
     ports:
-      - "${HOST_PORT:-3001}:3001"
+      - "${HOST_PORT:-3000}:3000"
     volumes:
       # Persist the SQLite database between container restarts/upgrades
       - db-data:/app/.local
@@ -22,13 +22,13 @@ services:
       - uploads-data:/app/uploads
     environment:
       NODE_ENV: production
-      PORT: 3001
+      PORT: 3000
       STATIC_DIR: /app/public
       # ── CHANGE THESE IN PRODUCTION ──
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-a-long-random-string}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
