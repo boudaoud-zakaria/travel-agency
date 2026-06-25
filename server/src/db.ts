@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 import path from "path";
 import fs from "fs";
+import bcrypt from "bcryptjs";
 
 const dbDir = path.resolve(process.cwd(), ".local");
 if (!fs.existsSync(dbDir)) {
@@ -201,6 +202,21 @@ export async function initializeDatabase() {
     await client.execute(sql);
   }
   console.log("Database initialized successfully");
+
+  // Bootstrap: create super admin if no users exist (fresh deployment)
+  const existing = await client.execute("SELECT COUNT(*) as count FROM users");
+  const count = Number((existing.rows[0] as any).count);
+  if (count === 0) {
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@tehwissa213.dz";
+    const adminPassword = process.env.ADMIN_PASSWORD || "Admin@123";
+    const hashed = await bcrypt.hash(adminPassword, 10);
+    await client.execute({
+      sql: `INSERT INTO users (email, password, name, phone, role, is_active) VALUES (?, ?, ?, ?, ?, 1)`,
+      args: [adminEmail, hashed, "Super Admin", "0550000000", "SUPER_ADMIN"],
+    });
+    console.log(`\n✅ Super admin created: ${adminEmail} / ${adminPassword}`);
+    console.log("   ⚠️  Change the password after first login!\n");
+  }
 }
 
 // JSON helpers
