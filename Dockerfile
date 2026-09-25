@@ -63,6 +63,6 @@ ENV STATIC_DIR=/app/public
 EXPOSE 3001
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD wget -qO- http://localhost:3001/health || exit 1
+  CMD wget -qO- "http://127.0.0.1:${PORT:-3001}/health" || exit 1
 
 CMD ["node", "dist/index.js"]
