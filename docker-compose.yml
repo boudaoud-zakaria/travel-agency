@@ -11,12 +11,12 @@ services:
     container_name: tehwissa213-app
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3001:3001"
     env_file:
       - .env
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - PORT=3001
     volumes:
       # Persist the SQLite database between container restarts/upgrades
       - db-data:/app/.local
