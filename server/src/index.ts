@@ -13,6 +13,12 @@ const app = express();
 const PORT = parseInt(process.env.PORT || "3001", 10);
 const IS_PROD = process.env.NODE_ENV === "production";
 
+// Behind Traefik/Dokploy's HTTPS-terminating reverse proxy: trust the
+// X-Forwarded-* headers so req.protocol/req.ip/secure cookies work correctly.
+if (IS_PROD) {
+  app.set("trust proxy", 1);
+}
+
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 // In production the server itself serves the frontend, so no CORS needed.
 if (!IS_PROD) {
